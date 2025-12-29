@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Age Calculator</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+* {
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    padding: 20px;
+}
+
+.container {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    border-radius: 18px;
+    padding: 30px;
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+h1 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.dedication {
+    font-size: 14px;
+    font-style: italic;
+    color: #ffebc7;
+    margin-top: 6px;
+}
+
+.dedication strong {
+    font-style: normal;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.divider {
+    height: 1px;
+    background: rgba(255,255,255,0.3);
+    margin: 18px 0;
+}
+
+input, button {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+input {
+    background: #fff;
+}
+
+button {
+    background: #ff9800;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 14px;
+}
+
+button:hover {
+    background: #e68900;
+}
+
+.share-btn {
+    background: #4caf50;
+}
+
+.share-btn:hover {
+    background: #3e8e41;
+}
+
+.result {
+    margin-top: 22px;
+}
+
+.age-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.card {
+    background: rgba(0,0,0,0.25);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.number {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.label {
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+.footer {
+    margin-top: 18px;
+    font-size: 11px;
+    opacity: 0.8;
+}
+
+/* Mobile */
+@media (max-width: 420px) {
+    h1 { font-size: 22px; }
+    .number { font-size: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>Live Age Calculator</h1>
+    <div class="dedication">Dedicated to <strong>Mr Anil Kumar Pathak</strong></div>
+
+    <div class="divider"></div>
+
+    <input type="text" id="dob" placeholder="DD-MM-YYYY" maxlength="10" oninput="formatDOB(this)">
+
+    <button onclick="start()">Calculate Age</button>
+    <button class="share-btn" onclick="shareApp()">Share</button>
+
+    <div class="result" id="result"></div>
+
+    <div class="footer">Made with lots of love ❤️</div>
+</div>
+
+<script>
+let timer;
+
+// Auto format DOB
+function formatDOB(input) {
+    let v = input.value.replace(/\D/g, "");
+    let f = "";
+    if (v.length > 0) f += v.slice(0,2);
+    if (v.length >= 3) f += "-" + v.slice(2,4);
+    if (v.length >= 5) f += "-" + v.slice(4,8);
+    input.value = f;
+}
+
+// Validate date
+function isValidDate(d, m, y) {
+    const date = new Date(y, m - 1, d);
+    return date.getFullYear() === y &&
+           date.getMonth() === m - 1 &&
+           date.getDate() === d;
+}
+
+function start() {
+    if (timer) clearInterval(timer);
+    calculate();
+    timer = setInterval(calculate, 1000);
+}
+
+function calculate() {
+    const dobStr = document.getElementById("dob").value;
+
+    if (dobStr.length !== 10) {
+        document.getElementById("result").innerText = "Please enter full DOB";
+        return;
+    }
+
+    const [d, m, y] = dobStr.split("-").map(Number);
+    if (!isValidDate(d, m, y)) {
+        document.getElementById("result").innerText = "Invalid Date ❌";
+        return;
+    }
+
+    const dob = new Date(y, m - 1, d, 0, 0, 0);
+    const now = new Date();
+
+    let years = now.getFullYear() - dob.getFullYear();
+    let months = now.getMonth() - dob.getMonth();
+    let days = now.getDate() - dob.getDate();
+
+    if (days < 0) {
+        months--;
+        days += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+    }
+
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    document.getElementById("result").innerHTML = `
+        <div class="age-grid">
+            <div class="card"><div class="number">${years}</div><div class="label">Years</div></div>
+            <div class="card"><div class="number">${months}</div><div class="label">Months</div></div>
+            <div class="card"><div class="number">${days}</div><div class="label">Days</div></div>
+            <div class="card"><div class="number">${now.getHours()}</div><div class="label">Hours</div></div>
+            <div class="card"><div class="number">${now.getMinutes()}</div><div class="label">Minutes</div></div>
+            <div class="card"><div class="number">${now.getSeconds()}</div><div class="label">Seconds</div></div>
+        </div>
+    `;
+}
+
+// Share feature
+function shareApp() {
+    const shareData = {
+        title: "Live Age Calculator",
+        text: "Check your exact age with this Live Age Calculator ❤️",
+        url: window.location.href
+    };
+
+    if (navigator.share) {
+        navigator.share(shareData);
+    } else {
+        navigator.clipboard.writeText(shareData.url);
+        alert("Link copied to clipboard!");
+    }
+}
+</script>
+
+</body>
+</html>
